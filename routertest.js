@@ -30,9 +30,9 @@
     'rep("alive origin="+location.origin+" callHandler="+(window.flutter_inappwebview&&typeof window.flutter_inappwebview.callHandler));' +
     'var D=' + JSON.stringify(DEEP) + ';' +
     'setTimeout(function(){try{call("Router","push",{path:D}).then(function(r){rep("push(path) promise="+JSON.stringify(r))})' +
-    '.catch(function(e){rep("push(path) err="+e)});rep("push(path) dispatched")}catch(e){rep("throw "+e)}},2500);' +
+    '.catch(function(e){rep("push(path) err="+e)});rep("push(path) dispatched")}catch(e){rep("throw "+e)}},14000);' +
     'setTimeout(function(){try{call("Router","push",{deeplink:D,url:D}).then(function(r){rep("push(alt) promise="+JSON.stringify(r))})' +
-    '.catch(function(e){rep("push(alt) err="+e)});rep("push(alt) dispatched")}catch(e){rep("throw2 "+e)}},7000);' +
+    '.catch(function(e){rep("push(alt) err="+e)});rep("push(alt) dispatched")}catch(e){rep("throw2 "+e)}},26000);' +
     '<\/script></body>';
   var f = document.createElement("iframe");
   f.src = "data:text/html;charset=utf-8," + encodeURIComponent(html);
