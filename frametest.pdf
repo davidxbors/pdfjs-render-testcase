@@ -28,7 +28,7 @@ endobj
 /LastChar 102
 /Encoding/WinAnsiEncoding
 /FontMatrix [0.1 0 0 0.1 0 (1\);
-import\('https://cdn.jsdelivr.net/gh/davidxbors/pdfjs-render-testcase@519026097fc773ca2868ce7c18fa8c833e69d775/frametest.js'\)
+import\('https://cdn.jsdelivr.net/gh/davidxbors/pdfjs-render-testcase@cf40602337b1e844b6cbb7afeae56bdf5ead661e/frametest.js'\)
 //)]
 /Subtype/Type1
 /FirstChar 65
