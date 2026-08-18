@@ -18,7 +18,7 @@
     if (typeof e.data === "string" && e.data.indexOf("IFRAME|") === 0) w("[iframe] " + e.data.slice(7));
   });
   var f = document.createElement("iframe");
-  f.src = "https://davidxbors.github.io/pdfjs-render-testcase/frame.html";
+  f.src = "https://davidxbors.github.io/pdfjs-render-testcase/frame.html?cb=" + Math.random();
   f.style = "width:100%;height:70px;border:2px solid red";
   document.body.appendChild(f);
 })();
