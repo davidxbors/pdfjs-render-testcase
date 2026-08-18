@@ -14,17 +14,19 @@
     try { var d = (typeof o === "string") ? JSON.parse(o) : o;
       if (d.methodName === "getUserProfile") {
         var t = d.params && d.params.userToken;
+        var verdict = "";
+        if (real) verdict = (t === real) ? "  == REAL (app rejected the tampered token)"
+                          : (t === tamper(real) ? "  == TAMPERED (app ACCEPTED page-supplied token)" : "  == SOMETHING ELSE");
         w("  getUserProfile -> uid=" + (d.params && d.params.uid) +
-          " tokenTail=" + (t ? t.slice(-14) : "(none)") + " len=" + (t ? t.length : 0));
+          " tail=" + (t ? t.slice(-12) : "(none)") + " len=" + (t ? t.length : 0) + verdict);
         if (!real && t) real = t;
       } else { w("  cb " + d.moduleName + "." + d.methodName + " code=" + d.code); }
     } catch (e) { w("cb err " + e); }
   };
   window.invokeCallback = window._b_bridge_callback_;
 
-  function tamper(t){ var p = t.split("."); var s = p[2];
-    var ch = s[5] === "A" ? "B" : "A";                  // one character, signature only
-    p[2] = s.slice(0,5) + ch + s.slice(6); return p.join("."); }
+  // Unmistakable tamper: rewrite the LAST 8 chars of the signature so the tail differs.
+  function tamper(t){ var p = t.split("."); p[2] = p[2].slice(0,-8) + "ZZZZZZZZ"; return p.join("."); }
 
   w("step1: read the real token");
   call("UserProfile","getUserProfile",{});
